@@ -179,6 +179,38 @@ defmodule Ecto.Integration.Custom do
   end
 end
 
+defmodule Ecto.Integration.ParentCustom do
+  @moduledoc """
+  This module is used to test:
+
+    * custom serial autogenerate primary key
+
+  """
+  use Ecto.Integration.Schema
+
+  @primary_key {:parent_custom_id, :id, autogenerate: true}
+  schema "parent_customs" do
+    has_many :child_customs, Ecto.Integration.ChildCustom, foreign_key: :parent_custom_id
+  end
+end
+
+defmodule Ecto.Integration.ChildCustom do
+  @moduledoc """
+  This module is used to test:
+
+    * custom serial autogenerate primary key
+    * setting of foreign key on insert
+
+  """
+  use Ecto.Integration.Schema
+
+  @primary_key {:child_custom_id, :id, autogenerate: true}
+  schema "child_customs" do
+    belongs_to :parent_custom, Ecto.Integration.ParentCustom, foreign_key: :parent_custom_id
+  end
+end
+
+
 defmodule Ecto.Integration.Barebone do
   @moduledoc """
   This module is used to test:

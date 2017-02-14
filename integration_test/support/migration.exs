@@ -54,6 +54,17 @@ defmodule Ecto.Integration.Migration do
       add :author_id, references(:users)
     end
 
+    create table(:parent_customs, primary_key: false) do
+      add :parent_custom_id, :serial, primary_key: true
+    end
+
+    create table(:child_customs, primary_key: false) do
+      add :child_custom_id, :serial, primary_key: true
+      add :parent_custom_id, references(:parent_customs, column: :parent_custom_id, on_delete: :nothing)
+    end
+
+create index(:child_customs, [:parent_custom_id])
+
     create table(:customs, primary_key: false) do
       add :bid, :binary_id, primary_key: true
       add :uuid, :uuid

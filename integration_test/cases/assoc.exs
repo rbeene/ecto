@@ -12,6 +12,9 @@ defmodule Ecto.Integration.AssocTest do
   alias Ecto.Integration.PostUser
   alias Ecto.Integration.Comment
   alias Ecto.Integration.Permalink
+  alias Ecto.Integration.ParentCustom
+  alias Ecto.Integration.ChildCustom
+
 
   test "has_many assoc" do
     p1 = TestRepo.insert!(%Post{title: "1"})
@@ -44,18 +47,20 @@ defmodule Ecto.Integration.AssocTest do
     assert l3.id == lid3
   end
 
-  test "belongs_to assoc" do
-    %Post{id: pid1} = TestRepo.insert!(%Post{title: "1"})
-    %Post{id: pid2} = TestRepo.insert!(%Post{title: "2"})
+  test "belongs_to assoc sets foreign key on insert" do
+    post = TestRepo.insert!(%Post{title: "1"})
+    l1 = TestRepo.insert!(%Permalink{url: "1", post: post})
 
-    l1 = TestRepo.insert!(%Permalink{url: "1", post_id: pid1})
-    l2 = TestRepo.insert!(%Permalink{url: "2"})
-    l3 = TestRepo.insert!(%Permalink{url: "3", post_id: pid2})
-
-    assert [p1, p2] = TestRepo.all Ecto.assoc([l1, l2, l3], :post)
-    assert p1.id == pid1
-    assert p2.id == pid2
+    assert l1.post_id == post.id
   end
+
+  test "belongs_to assoc set custom foreign key on insert" do
+    parent = TestRepo.insert!(%ParentCustom{})
+    child = TestRepo.insert!(%ChildCustom{parent_custom: parent})
+
+    assert child.parent_custom_id == parent.parent_custom_id
+  end
+
 
   test "has_many through assoc" do
     p1 = TestRepo.insert!(%Post{})
